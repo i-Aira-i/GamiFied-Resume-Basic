@@ -4,7 +4,7 @@ A retro-style 8-bit interactive resume game! 🕹️
 
 Navigate through different levels, collect skills and achievements, and uncover Aira's professional journey in a fun, gamified way.
 
-![Game Screenshot](images/image.png)
+![Game Screenshot](images/image.jpg)
 
 ## 🎮 How to Play
 
