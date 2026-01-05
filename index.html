@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rashi Resume Quest (8-bit)</title>
+  <title>Aira Resume Quest (8-bit)</title>
   <link rel="stylesheet" href="style.css">
   <!-- Pixel font for retro style -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="logo">
-    <img src="images/profile.png" alt="Rashi Photo" class="logo-photo">
+    <img src="images/profile.png" alt="Aira Photo" class="logo-photo">
   </div>
   <!-- Game Title -->
-  <h2 class="title">Rashi Resume Quest</h2>
+  <h2 class="title">Aira Resume Quest</h2>
   <!-- Progress Bar -->
   <div id="progressBar"><div id="progress"></div></div>
 
@@ -25,7 +25,13 @@
   <!-- Music & Fullscreen Controls (always visible, place with CSS absolute inside Game Area if desired) -->
   <div id="musicControls">
     <button id="musicToggle" title="Play/Pause Music">
-      <span id="musicIcon">▶️</span>
+      <span id="musicIcon">🎵</span>
+    </button>
+    <button id="pauseToggle" title="Pause Game">
+      <span id="pauseIcon">⏸️</span>
+    </button>
+    <button id="restartBtn" title="Restart Game">
+      <span id="restartIcon">🔄</span>
     </button>
   </div>
   <button id="fullscreenToggle" title="Fullscreen Game">
@@ -47,7 +53,7 @@
   <div id="creditScreen">
     <div id="creditInner">
       <div class="creditTitle">CREDITS</div>
-      <div class="creditSubtitle">Rashi Resume Quest - Movie Ending</div>
+      <div class="creditSubtitle">Aira Resume Quest - Movie Ending</div>
       <div class="creditContent" id="finalResume"></div>
       <div class="creditAwards">🏆 Achievement Unlocked: Completed Resume Quest!</div>
       <button onclick="location.reload()" class="creditBtn">Restart Game</button>

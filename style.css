@@ -113,7 +113,7 @@ body {
   }
   
   /* ===== Music & Fullscreen Controls ===== */
-  #musicToggle, #fullscreenToggle {
+  #musicToggle, #fullscreenToggle, #pauseToggle, #restartBtn {
     position: absolute;
     top: 12px;
     width: 38px;
@@ -135,14 +135,20 @@ body {
   #musicToggle {
     right: 12px;
   }
-  #fullscreenToggle {
+  #pauseToggle {
     right: 62px;
   }
-  #musicToggle:active, #fullscreenToggle:active {
+  #restartBtn {
+    right: 112px;
+  }
+  #fullscreenToggle {
+    right: 162px;
+  }
+  #musicToggle:active, #fullscreenToggle:active, #pauseToggle:active, #restartBtn:active {
     background: #e9cd3c;
     color: #222;
   }
-  #musicToggle:hover, #fullscreenToggle:hover {
+  #musicToggle:hover, #fullscreenToggle:hover, #pauseToggle:hover, #restartBtn:hover {
     background: #444;
   }
   
@@ -245,7 +251,7 @@ body {
     position: absolute;
     width: 32px;
     height: 32px;
-    background: #a35e2e url('https://i.imgur.com/NwpLiNJ.png') center/cover no-repeat;
+    background: #a35e2e;
     border: 2px solid #333;
     box-shadow: 2px 2px 0 #111;
     z-index: 1;
@@ -258,7 +264,7 @@ body {
     position: absolute;
     width: 32px;
     height: 32px;
-    background: #f13b3b url('https://i.imgur.com/PWw6TQk.png') center/cover no-repeat; /* Use your own sprite! */
+    background: #f13b3b; /* Use your own sprite! */
     border: 2px solid #000; border-radius: 6px;
     z-index: 3;
     filter: drop-shadow(0 0 8px #e91e63);

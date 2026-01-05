@@ -13,6 +13,9 @@ const sndJump        = document.getElementById('sndJump');
 const bgMusic        = document.getElementById('bgMusic');
 const musicToggle    = document.getElementById('musicToggle');
 const musicIcon      = document.getElementById('musicIcon');
+const pauseToggle    = document.getElementById('pauseToggle');
+const pauseIcon      = document.getElementById('pauseIcon');
+const restartBtn     = document.getElementById('restartBtn');
 const fullscreenToggle = document.getElementById('fullscreenToggle');
 const fullscreenIcon   = document.getElementById('fullscreenIcon');
 const timerEl        = document.getElementById('timer');
@@ -24,15 +27,17 @@ let collectibles  = [];
 let collected     = [];
 let avX = 32, avY = 32, jumps = 0;
 let musicPlaying  = false;
-let startTime, timerInterval, score = 0;
+let isPaused = false;
+let startTime, timerInterval, score = 0, pausedTime = 0;
+let collectibleInterval;
 
 // -- Resume Data --
 const resumeData = `
-  <strong>Name:</strong> Rashi<br>
-  <strong>Email:</strong> raashisindhav@gmail.com<br>
+  <strong>Name:</strong> Aira<br>
+  <strong>Email:</strong> aira@example.com<br>
   <strong>Contact:</strong> 95******00<br>
-  <strong>Address:</strong> *****,110059<br>
-  <strong>Education:</strong> Class X (96%), Class XII (94%), B.Sc Electronics<br>
+  <strong>Address:</strong> *****,1100xx<br>
+  <strong>Education:</strong> Class X (96%), Class XII (94%), B.Sc CS<br>
   <strong>Tech Skills:</strong> Database, C/Java, SQL, CCC Certificate<br>
   <strong>Interests:</strong> Civil Services, Tech in Governance, Agile, Scrum<br>
   <strong>Extracurricular:</strong> Guitar/Singing<br>
@@ -42,7 +47,7 @@ const resumeData = `
 const LEVELS = [
   {
     name: "Education & Skills",
-    bg: "#84b9f7 url('https://i.imgur.com/60k0T0I.png') repeat",
+    bg: "#84b9f7 url('images/bg.png') repeat",
     collectibles: [
       { icon:"📘", text:"Class X: 96%" },
       { icon:"📗", text:"Class XII: 94%" },
@@ -60,7 +65,7 @@ const LEVELS = [
   },
   {
     name: "Achievements & Personality",
-    bg: "#e9cd3c url('https://i.imgur.com/vigkYyD.png') repeat",
+    bg: "#e9cd3c url('images/bg.png') repeat",
     collectibles: [
       { icon:"⭐", text:"Leadership" },
       { icon:"💬", text:"Communication" },
@@ -157,8 +162,9 @@ function nextLevel() {
 
 // -- Timer & Score --
 function updateTimer() {
+  if (isPaused) return;
   let now = Date.now();
-  let elapsed = Math.floor((now - startTime)/1000);
+  let elapsed = Math.floor((now - startTime - pausedTime)/1000);
   let min = Math.floor(elapsed/60).toString().padStart(2,'0');
   let sec = (elapsed%60).toString().padStart(2,'0');
   timerEl.textContent = 'Time: ' + min + ':' + sec;
@@ -178,6 +184,33 @@ function showCredit() {
     `<br><br><strong>Final Time:</strong> ${timerEl.textContent.split(' ')[1]}` +
     `<br><strong>Final Score:</strong> ${score}`;
 }
+
+// -- Pause & Restart --
+let pauseStartTime;
+
+pauseToggle.onclick = function() {
+  isPaused = !isPaused;
+  if (isPaused) {
+    pauseIcon.textContent = '▶️';
+    clearInterval(timerInterval);
+    clearInterval(enemyInterval);
+    clearInterval(collectibleInterval);
+    pauseStartTime = Date.now();
+    showLevelPopup("PAUSED");
+    document.getElementById('levelPopup').style.display = 'flex'; // Keep it visible
+  } else {
+    pauseIcon.textContent = '⏸️';
+    pausedTime += (Date.now() - pauseStartTime);
+    timerInterval = setInterval(updateTimer, 1000);
+    startEnemyMovement();
+    startCollectibleAnimation();
+    document.getElementById('levelPopup').style.display = 'none';
+  }
+};
+
+restartBtn.onclick = function() {
+  location.reload();
+};
 
 // -- Fullscreen & Music --
 fullscreenToggle.onclick = function () {
@@ -199,11 +232,11 @@ musicToggle.onclick = function () {
   if (!musicPlaying) {
     bgMusic.play();
     musicPlaying = true;
-    musicIcon.textContent = '⏸️';
+    musicIcon.textContent = '🔇';
   } else {
     bgMusic.pause();
     musicPlaying = false;
-    musicIcon.textContent = '▶️';
+    musicIcon.textContent = '🎵';
   }
 };
 
@@ -220,6 +253,7 @@ function isBlocked(nx, ny) {
 
 // -- Keyboard Controls & Avatar Movement --
 document.addEventListener('keydown', (e) => {
+  if (isPaused) return;
   let { w: gameW, h: gameH } = getGameSize();
   let nx = avX, ny = avY, moved = false;
   if (e.key === 'ArrowUp')    { if (avY < (gameH - gridSize)) ny += gridSize; }
@@ -244,16 +278,21 @@ document.addEventListener('keydown', (e) => {
 });
 
 // -- Animate Collectibles Randomly --
-setInterval(() => {
-  let { w: gameW, h: gameH } = getGameSize();
-  document.querySelectorAll('.collectible').forEach(el => {
-    if (collected.includes(el.dataset.index)) return;
-    let nx = Math.max(0, Math.min(parseInt(el.style.left)+(Math.random()*64-32), gameW-gridSize));
-    let ny = Math.max(0, Math.min(parseInt(el.style.bottom)+(Math.random()*64-32), gameH-gridSize));
-    el.style.left  = (Math.round(nx/gridSize)*gridSize) + "px";
-    el.style.bottom= (Math.round(ny/gridSize)*gridSize) + "px";
-  });
-}, 900);
+function startCollectibleAnimation() {
+  clearInterval(collectibleInterval);
+  collectibleInterval = setInterval(() => {
+    if (isPaused) return;
+    let { w: gameW, h: gameH } = getGameSize();
+    document.querySelectorAll('.collectible').forEach(el => {
+      if (collected.includes(el.dataset.index)) return;
+      let nx = Math.max(0, Math.min(parseInt(el.style.left)+(Math.random()*64-32), gameW-gridSize));
+      let ny = Math.max(0, Math.min(parseInt(el.style.bottom)+(Math.random()*64-32), gameH-gridSize));
+      el.style.left  = (Math.round(nx/gridSize)*gridSize) + "px";
+      el.style.bottom= (Math.round(ny/gridSize)*gridSize) + "px";
+    });
+  }, 900);
+}
+startCollectibleAnimation();
 
 let enemyX = 0, enemyY = 0, enemyInterval;
 
@@ -351,7 +390,7 @@ window.addEventListener('load', () => {
   startEnemyMovement();
   avatar.style.left = avX + 'px';
   avatar.style.bottom = avY + 'px';
-  startTime = Date.now(); score = 0;
+  startTime = Date.now(); score = 0; pausedTime = 0;
   updateTimer(); updateScore(); drawObstacles();
   timerInterval = setInterval(updateTimer, 1000);
   bgMusic.volume = 0.22; bgMusic.play();
